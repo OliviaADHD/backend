@@ -1,0 +1,9 @@
+spring:
+    jpa:
+        hibernate:
+            ddl-auto: update
+    datasource:
+        url: jdbc:mysql://localhost:3306/olivia
+        username: root
+        password: admin
+        driver-class-name: com.mysql.jdbc.Driver
