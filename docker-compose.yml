@@ -1,0 +1,19 @@
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+  olivia-bank:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: olivia
+      MYSQL_USER: user
+      MYSQL_PASSWORD: passw      
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8008:8080
