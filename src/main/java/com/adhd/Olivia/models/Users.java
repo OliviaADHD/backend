@@ -17,6 +17,8 @@ public class Users {
 	  
 	  private String email;
 	  
+	  private boolean isConfirmed;
+	  
 		  
 	  private String password;
 	  
@@ -58,6 +60,14 @@ public class Users {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public boolean isConfirmed() {
+		return isConfirmed;
+	}
+
+	public void setConfirmed(boolean isConfirmed) {
+		this.isConfirmed = isConfirmed;
 	}
 
 

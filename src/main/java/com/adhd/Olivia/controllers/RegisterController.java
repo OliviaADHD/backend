@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.adhd.Olivia.helper.EmailMethods;
 import com.adhd.Olivia.models.Users;
 import com.adhd.Olivia.repo.UserRepository;
 
@@ -32,7 +33,9 @@ public class RegisterController {
 		if(loginBasedUsers.size()>0) {
 			return new ResponseEntity<String>("Login exists",HttpStatus.FORBIDDEN);
 		}
+		user.setConfirmed(false);
 		userRepo.save(user);
+		EmailMethods.sendSignUpEmail();
 		return new ResponseEntity<String>("Created",HttpStatus.CREATED);		
 	}
 	
