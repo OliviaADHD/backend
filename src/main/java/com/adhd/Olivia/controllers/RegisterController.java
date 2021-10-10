@@ -23,7 +23,7 @@ public class RegisterController {
 	
 	@PostMapping("/signup")
 	public ResponseEntity<String> newUser(@RequestBody Users user){
-		System.out.println(user.getName());
+		System.out.println(user.getFullName());
 		List<Users> emailBasedUsers = userRepo.findByEmail(user.getEmail());
 		List<Users> loginBasedUsers = userRepo.findByLogin(user.getLogin());
 		if(emailBasedUsers.size()>0) {

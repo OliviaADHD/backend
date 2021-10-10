@@ -13,7 +13,7 @@ public class Users {
 	  
 	  private String login;
 	  
-	  private String name;		  
+	  private String fullName;		  
 	  
 	  private String email;
 	  
@@ -28,12 +28,12 @@ public class Users {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getFullName() {
+		return fullName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 
 	public String getEmail() {
