@@ -2,6 +2,8 @@ package com.adhd.Olivia.controllers;
 
 import java.util.List;
 
+import javax.mail.MessagingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.adhd.Olivia.models.Users;
 import com.adhd.Olivia.repo.UserRepository;
+import com.adhd.Olivia.services.MailService;
+import com.adhd.Olivia.custom.MailTypes;
+
 
 @RestController
 @RequestMapping("/")
@@ -21,9 +26,12 @@ public class RegisterController {
 	@Autowired
 	public UserRepository userRepo;
 	
+	@Autowired
+	private MailService mailService;
+    
 	@PostMapping("/signup")
-	public ResponseEntity<String> newUser(@RequestBody Users user){
-		System.out.println(user.getName());
+	public ResponseEntity<String> newUser(@RequestBody Users user) throws MessagingException{
+		System.out.println(user.getFullName());
 		List<Users> emailBasedUsers = userRepo.findByEmail(user.getEmail());
 		List<Users> loginBasedUsers = userRepo.findByLogin(user.getLogin());
 		if(emailBasedUsers.size()>0) {
@@ -32,7 +40,9 @@ public class RegisterController {
 		if(loginBasedUsers.size()>0) {
 			return new ResponseEntity<String>("Login exists",HttpStatus.FORBIDDEN);
 		}
+		user.setConfirmed(false);
 		userRepo.save(user);
+		mailService.sendEmail(MailTypes.signUp());
 		return new ResponseEntity<String>("Created",HttpStatus.CREATED);		
 	}
 	

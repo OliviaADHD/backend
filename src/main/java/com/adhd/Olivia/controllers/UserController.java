@@ -23,7 +23,7 @@ public class UserController {
 	
 	@PutMapping("/update")
 	public ResponseEntity<String> updateUser(@RequestBody Users user){
-		System.out.println(user.getName());
+		System.out.println(user.getFullName());
 		Optional<Users> optionalNewUser = userRepo.findById(user.getId());
 		if(optionalNewUser.isPresent()) {
 			Users newUser = optionalNewUser.get();
