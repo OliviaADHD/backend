@@ -5,8 +5,10 @@ spring:
     mail:
         host: smtp.gmail.com
         port: 587
-        username: oliviaapp19@gmail.com
-        password: X%ECRL5%tAh6
+        username: <username>
+        password: <password>
+        debug: false
+        protocol: smtp
         smtp:
             auth: true
             starttls:
@@ -16,3 +18,4 @@ spring:
         username: root
         password: admin
         driver-class-name: com.mysql.jdbc.Driver
+
