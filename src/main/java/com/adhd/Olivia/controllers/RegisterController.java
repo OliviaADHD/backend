@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.mail.MessagingException;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,9 +43,28 @@ public class RegisterController {
 		}
 		user.setConfirmed(false);
 		userRepo.save(user);
-		mailService.sendEmail(MailTypes.signUp());
+		mailService.sendEmail(MailTypes.signUp(user.getEmail()));
 		return new ResponseEntity<String>("Created",HttpStatus.CREATED);		
 	}
+	
+	
+	@PostMapping("/reset-password")
+	public ResponseEntity<String> reset(@RequestBody String email) throws MessagingException{
+		System.out.println(email);
+		List<Users> emailBasedUsers = userRepo.findByEmail(email);
+		if(emailBasedUsers.size()==0) {
+			return new ResponseEntity<String>("Email doesn't exist",HttpStatus.FORBIDDEN);
+		}
+		else {
+			Users usr = emailBasedUsers.get(0);			
+			String randomPassword = RandomStringUtils.randomAlphabetic(10);
+			usr.setPassword(randomPassword);
+			userRepo.save(usr);
+			mailService.sendEmail(MailTypes.resetPassword(usr.getEmail(),randomPassword));
+			return new ResponseEntity<String>("OK",HttpStatus.OK);
+		}			
+	}
+	
 	
 	@PostMapping("/google")
 	public ResponseEntity<String> newUserByGoogle(@RequestBody Users user){
