@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.adhd.Olivia.models.Login;
 import com.adhd.Olivia.models.Users;
 import com.adhd.Olivia.repo.UserRepository;
 import com.adhd.Olivia.services.MailService;
@@ -83,11 +84,12 @@ public class RegisterController {
 	
 	
 	@GetMapping("/login")
-	public ResponseEntity<String> login(@RequestBody String email,@RequestBody String password){
-		System.out.println(email);
-		List<Users> logedInUser = userRepo.findByEmailAndPassword(email, password);
+	public ResponseEntity<String> login(@RequestBody Login signIn){
+		System.out.println(signIn.getEmail());
+		List<Users> logedInUser = userRepo.findByEmailAndPassword(signIn.getEmail(), signIn.getPassword());
 		if(logedInUser.size()==1) {
-			return new ResponseEntity<String>("Granted",HttpStatus.OK);		
+			String response = "{ 'userId':"+logedInUser.get(0).getId()+", 'name':"+logedInUser.get(0).getFullName()+"}";
+			return new ResponseEntity<String>(response,HttpStatus.OK);		
 		}else {
 			return new ResponseEntity<String>("Not Found",HttpStatus.NOT_FOUND);
 		}
