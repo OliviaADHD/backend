@@ -1,11 +1,19 @@
 package com.adhd.Olivia.models.db;
 
-import java.util.Arrays;
+import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.adhd.Olivia.enums.AgeGroup;
 import com.adhd.Olivia.enums.Status;
@@ -15,16 +23,24 @@ import com.adhd.Olivia.enums.Duration;
 public class Questionarrie {
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
     private int id;
 	
+	@Column(name = "age_group")
 	@Enumerated(EnumType.ORDINAL)
     private AgeGroup ageGroup;
 	
+	@Column(name = "status")
 	@Enumerated(EnumType.ORDINAL)
-    private Status status; 
+    private Status status;
+	
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 	
 	private String symptoms;
 	
+	@Column(name = "duration")
 	@Enumerated(EnumType.ORDINAL)
 	private Duration duration;
 	
@@ -58,10 +74,8 @@ public class Questionarrie {
 		return symptoms;
 	}
 
-	public void setSymptoms(int symptoms[] ) {
-		String parsedSymptoms = Arrays.toString(symptoms);
-		parsedSymptoms = parsedSymptoms.substring(1);
-		parsedSymptoms = parsedSymptoms.substring(0, parsedSymptoms.length() - 1);
+	public void setSymptoms(List<Integer> symptoms) {
+		String parsedSymptoms = StringUtils.join(symptoms, ",");
 		this.symptoms = parsedSymptoms;
 	}
 
@@ -77,12 +91,20 @@ public class Questionarrie {
 		return sleepTime;
 	}
 
-	public void setSleepTime(int sleepTime[] ) {
-		String parsedSleepTime = Arrays.toString(sleepTime);
-		parsedSleepTime = parsedSleepTime.substring(1);
-		parsedSleepTime = parsedSleepTime.substring(0, parsedSleepTime.length() - 1);
+	public void setSleepTime(List<Integer> sleepTime) {
+		String parsedSleepTime = StringUtils.join(sleepTime, ",");
 		this.sleepTime = parsedSleepTime;
 	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
+	
 	
 	
 }

@@ -26,4 +26,17 @@ public enum Duration {
 	public void setId(int id) {
 		this.id = id;
 	}
+	
+	public static Duration getById(int id){
+		Duration response = null;
+		Duration durs[] = Duration.values();
+		for(Duration dur: durs) {
+			if (dur.getId() == id) {
+				response = dur;
+				break;
+				
+			}
+		}
+		return response;		
+	}
 }

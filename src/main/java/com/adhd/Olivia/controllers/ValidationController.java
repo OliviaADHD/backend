@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.adhd.Olivia.models.db.Users;
+import com.adhd.Olivia.models.db.User;
 import com.adhd.Olivia.repo.UserRepository;
 
 @RestController
@@ -23,7 +23,7 @@ public class ValidationController {
 	@PostMapping("/login/{login}")
 	public ResponseEntity<String> checkLogin(@PathVariable String login){
 		System.out.println(login);
-		List<Users> loginBasedUsers = userRepo.findByLogin(login);
+		List<User> loginBasedUsers = userRepo.findByLogin(login);
 		if(loginBasedUsers.size()>0) {
 			return new ResponseEntity<String>("Login exists",HttpStatus.FORBIDDEN);
 		}
@@ -33,7 +33,7 @@ public class ValidationController {
 	@PostMapping("/email/{email}")
 	public ResponseEntity<String> checkEmail(@PathVariable String email){
 		System.out.println(email);
-		List<Users> emailBasedUsers = userRepo.findByEmail(email);
+		List<User> emailBasedUsers = userRepo.findByEmail(email);
 		if(emailBasedUsers.size()>0) {
 			return new ResponseEntity<String>("Email exists",HttpStatus.FORBIDDEN);
 		}

@@ -29,4 +29,14 @@ public enum SleepTime {
 	public void setId(int id) {
 		this.id = id;
 	}
+	
+	public static SleepTime getById(int id){
+		SleepTime sleeps[] = SleepTime.values();
+		for(SleepTime sleep: sleeps) {
+			if (sleep.getId() == id) {
+				return sleep;
+			}
+		}
+		return null;		
+	}
 }

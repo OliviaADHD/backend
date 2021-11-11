@@ -26,5 +26,16 @@ public enum AgeGroup {
 		this.id = id;
 	}
 	
+	public static AgeGroup getById(int id){
+		AgeGroup response = null;
+		AgeGroup ages[] = AgeGroup.values();
+		for(AgeGroup age: ages) {
+			if (age.getId() == id) {
+				response = age;
+				break;
+			}
+		}
+		return response;		
+	}
 	
 }

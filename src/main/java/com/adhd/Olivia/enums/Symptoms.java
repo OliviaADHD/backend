@@ -27,4 +27,14 @@ public enum Symptoms {
 	public void setId(int id) {
 		this.id = id;
 	}
+	
+	public static Symptoms getById(int id){
+		Symptoms symps[] = Symptoms.values();
+		for(Symptoms symp: symps) {
+			if (symp.getId() == id) {
+				return symp;
+			}
+		}
+		return null;		
+	}
 }

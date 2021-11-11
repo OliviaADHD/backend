@@ -27,4 +27,16 @@ public enum Status {
 	public void setId(int id) {
 		this.id = id;
 	}
+	
+	public static Status getById(int id){
+		Status response = null;
+		Status statuses[] = Status.values();
+		for(Status stat: statuses) {
+			if (stat.getId() == id) {
+				response = stat;
+				break;
+			}
+		}
+		return response;		
+	}
 }

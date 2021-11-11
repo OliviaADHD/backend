@@ -6,6 +6,8 @@ public class QuestionarrieResp {
 
 	private int ageGroup;
 	
+	private int userId;
+	
 	private int status;
 	
 	private int duration;
@@ -20,6 +22,14 @@ public class QuestionarrieResp {
 
 	public void setAgeGroup(int ageGroup) {
 		this.ageGroup = ageGroup;
+	}
+	
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
 	}
 
 	public int getStatus() {
