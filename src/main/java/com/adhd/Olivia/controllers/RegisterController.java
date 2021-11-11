@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.adhd.Olivia.models.Login;
-import com.adhd.Olivia.models.Users;
+import com.adhd.Olivia.models.db.Users;
+import com.adhd.Olivia.models.response.Login;
 import com.adhd.Olivia.repo.UserRepository;
 import com.adhd.Olivia.services.MailService;
 import com.adhd.Olivia.custom.MailTypes;

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.adhd.Olivia.models.Users;
+import com.adhd.Olivia.models.db.Users;
 
 public interface UserRepository extends CrudRepository<Users, Integer> {
 	Users findById(int id);

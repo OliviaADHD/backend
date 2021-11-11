@@ -1,4 +1,4 @@
-package com.adhd.Olivia.models;
+package com.adhd.Olivia.models.response;
 
 public class Login {
 

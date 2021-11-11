@@ -1,4 +1,4 @@
-package com.adhd.Olivia.models;
+package com.adhd.Olivia.models.db;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
