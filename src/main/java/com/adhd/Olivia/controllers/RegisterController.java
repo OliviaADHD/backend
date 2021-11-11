@@ -42,7 +42,6 @@ public class RegisterController {
 		if(loginBasedUsers.size()>0) {
 			return new ResponseEntity<String>("Login exists",HttpStatus.FORBIDDEN);
 		}
-		user.setConfirmed(false);
 		userRepo.save(user);
 		mailService.sendEmail(MailTypes.signUp(user.getEmail()));
 		return new ResponseEntity<String>("Created",HttpStatus.CREATED);		
