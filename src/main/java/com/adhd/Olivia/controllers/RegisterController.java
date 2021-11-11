@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.adhd.Olivia.models.Login;
-import com.adhd.Olivia.models.Users;
+import com.adhd.Olivia.models.db.User;
+import com.adhd.Olivia.models.response.Login;
 import com.adhd.Olivia.repo.UserRepository;
 import com.adhd.Olivia.services.MailService;
 import com.adhd.Olivia.custom.MailTypes;
@@ -32,10 +32,10 @@ public class RegisterController {
 	private MailService mailService;
     
 	@PostMapping("/signup")
-	public ResponseEntity<String> newUser(@RequestBody Users user) throws MessagingException{
+	public ResponseEntity<String> newUser(@RequestBody User user) throws MessagingException{
 		System.out.println(user.getFullName());
-		List<Users> emailBasedUsers = userRepo.findByEmail(user.getEmail());
-		List<Users> loginBasedUsers = userRepo.findByLogin(user.getLogin());
+		List<User> emailBasedUsers = userRepo.findByEmail(user.getEmail());
+		List<User> loginBasedUsers = userRepo.findByLogin(user.getLogin());
 		if(emailBasedUsers.size()>0) {
 			return new ResponseEntity<String>("Email exists",HttpStatus.FORBIDDEN);
 		}
@@ -51,12 +51,12 @@ public class RegisterController {
 	@PostMapping("/reset-password")
 	public ResponseEntity<String> reset(@RequestBody String email) throws MessagingException{
 		System.out.println(email);
-		List<Users> emailBasedUsers = userRepo.findByEmail(email);
+		List<User> emailBasedUsers = userRepo.findByEmail(email);
 		if(emailBasedUsers.size()==0) {
 			return new ResponseEntity<String>("Email doesn't exist",HttpStatus.FORBIDDEN);
 		}
 		else {
-			Users usr = emailBasedUsers.get(0);			
+			User usr = emailBasedUsers.get(0);			
 			String randomPassword = RandomStringUtils.randomAlphabetic(10);
 			usr.setPassword(randomPassword);
 			userRepo.save(usr);
@@ -67,17 +67,17 @@ public class RegisterController {
 	
 	
 	@PostMapping("/google")
-	public ResponseEntity<String> newUserByGoogle(@RequestBody Users user){
+	public ResponseEntity<String> newUserByGoogle(@RequestBody User user){
 		return new ResponseEntity<String>("Waiting for development",HttpStatus.TEMPORARY_REDIRECT);		
 	}
 	
 	@PostMapping("/facebook")
-	public ResponseEntity<String> newUserByFacebook(@RequestBody Users user){
+	public ResponseEntity<String> newUserByFacebook(@RequestBody User user){
 		return new ResponseEntity<String>("Waiting for development",HttpStatus.TEMPORARY_REDIRECT);		
 	}
 	
 	@PostMapping("/apple")
-	public ResponseEntity<String> newUserByApple(@RequestBody Users user){
+	public ResponseEntity<String> newUserByApple(@RequestBody User user){
 		return new ResponseEntity<String>("Waiting for development",HttpStatus.TEMPORARY_REDIRECT);		
 	}
 	
@@ -85,7 +85,7 @@ public class RegisterController {
 	@GetMapping("/login")
 	public ResponseEntity<String> login(@RequestBody Login signIn){
 		System.out.println(signIn.getEmail());
-		List<Users> logedInUser = userRepo.findByEmailAndPassword(signIn.getEmail(), signIn.getPassword());
+		List<User> logedInUser = userRepo.findByEmailAndPassword(signIn.getEmail(), signIn.getPassword());
 		if(logedInUser.size()==1) {
 			String response = "{ 'userId':"+logedInUser.get(0).getId()+", 'name':"+logedInUser.get(0).getFullName()+"}";
 			return new ResponseEntity<String>(response,HttpStatus.OK);		

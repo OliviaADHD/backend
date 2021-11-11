@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.adhd.Olivia.models.Users;
+import com.adhd.Olivia.models.db.User;
 
-public interface UserRepository extends CrudRepository<Users, Integer> {
-	Users findById(int id);
-	List<Users> findByEmail(String email);
-	List<Users> findByLogin(String login);
-	List<Users> findByEmailAndPassword(String email,String password);
+public interface UserRepository extends CrudRepository<User, Integer> {
+	User findById(int id);
+	List<User> findByEmail(String email);
+	List<User> findByLogin(String login);
+	List<User> findByEmailAndPassword(String email,String password);
 }

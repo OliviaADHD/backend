@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.adhd.Olivia.models.Users;
+import com.adhd.Olivia.models.db.User;
 import com.adhd.Olivia.repo.UserRepository;
 
 @RestController
@@ -22,11 +22,11 @@ public class UserController {
 	public UserRepository userRepo;
 	
 	@PutMapping("/update")
-	public ResponseEntity<String> updateUser(@RequestBody Users user){
+	public ResponseEntity<String> updateUser(@RequestBody User user){
 		System.out.println(user.getFullName());
-		Optional<Users> optionalNewUser = userRepo.findById(user.getId());
+		Optional<User> optionalNewUser = userRepo.findById(user.getId());
 		if(optionalNewUser.isPresent()) {
-			Users newUser = optionalNewUser.get();
+			User newUser = optionalNewUser.get();
 			newUser.setEmail(user.getEmail());
 			newUser.setPassword(user.getPassword());
 			newUser.setLogin(user.getLogin());
