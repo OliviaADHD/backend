@@ -1,6 +1,10 @@
 package com.adhd.Olivia.controllers;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.mail.MessagingException;
 
@@ -9,15 +13,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.adhd.Olivia.models.db.Questionarrie;
 import com.adhd.Olivia.models.db.User;
 import com.adhd.Olivia.models.response.Login;
+import com.adhd.Olivia.repo.QuestionarrieRepo;
 import com.adhd.Olivia.repo.UserRepository;
 import com.adhd.Olivia.services.MailService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.adhd.Olivia.custom.MailTypes;
 
 
@@ -29,10 +38,13 @@ public class RegisterController {
 	public UserRepository userRepo;
 	
 	@Autowired
+	public QuestionarrieRepo questionRepo;
+	
+	@Autowired
 	private MailService mailService;
     
 	@PostMapping("/signup")
-	public ResponseEntity<String> newUser(@RequestBody User user) throws MessagingException{
+	public ResponseEntity<String> newUser(@RequestBody User user) throws MessagingException, JsonProcessingException{
 		System.out.println(user.getFullName());
 		List<User> emailBasedUsers = userRepo.findByEmail(user.getEmail());
 		List<User> loginBasedUsers = userRepo.findByLogin(user.getLogin());
@@ -43,8 +55,12 @@ public class RegisterController {
 			return new ResponseEntity<String>("Login exists",HttpStatus.FORBIDDEN);
 		}
 		userRepo.save(user);
+		Map<String,Object> response = new HashMap<>();
+		response.put("userId",user.getId());
+		response.put("name",user.getFullName());
+		String json = new ObjectMapper().writeValueAsString(response);
 		mailService.sendEmail(MailTypes.signUp(user.getEmail()));
-		return new ResponseEntity<String>("Created",HttpStatus.CREATED);		
+		return new ResponseEntity<String>(json,HttpStatus.CREATED);		
 	}
 	
 	
@@ -82,17 +98,52 @@ public class RegisterController {
 	}
 	
 	
-	@GetMapping("/login")
-	public ResponseEntity<String> login(@RequestBody Login signIn){
-		System.out.println(signIn.getEmail());
-		List<User> logedInUser = userRepo.findByEmailAndPassword(signIn.getEmail(), signIn.getPassword());
-		if(logedInUser.size()==1) {
-			String response = "{ 'userId':"+logedInUser.get(0).getId()+", 'name':"+logedInUser.get(0).getFullName()+"}";
-			return new ResponseEntity<String>(response,HttpStatus.OK);		
+	@PostMapping("/login")
+	public ResponseEntity<String> signIn(@RequestBody String json) throws JsonProcessingException{
+		ObjectMapper mapper = new ObjectMapper();
+        try {
+            Map<String, String> map = mapper.readValue(json, Map.class);
+            String email = map.get("email");
+            String password = map.get("password");
+    		List<User> logedInUser = userRepo.findByEmailAndPassword(email, password);
+    		if(logedInUser.size()==1) {			
+    			Map<String,Object> response = new HashMap<>();
+    			response.put("userId",logedInUser.get(0).getId());
+    			response.put("name",logedInUser.get(0).getFullName());
+    			Optional<Questionarrie> firstTime = questionRepo.findByUser(logedInUser.get(0));			
+    			if(firstTime.isPresent()) {
+    				response.put("firstTime",false);
+    			}else {
+    				response.put("firstTime",true);
+    			}			
+    			String responseJson = new ObjectMapper().writeValueAsString(response);
+    			return new ResponseEntity<String>(responseJson,HttpStatus.OK);		
+    		}else {
+    			return new ResponseEntity<String>("Not Found",HttpStatus.NOT_FOUND);
+    		}
+        } catch (IOException e) {
+        	return new ResponseEntity<String>("Server Error",HttpStatus.INTERNAL_SERVER_ERROR);
+        }		
+	}
+	
+	@GetMapping("/login2/{email}/{password}")
+	public ResponseEntity<String> temporalLogin(@PathVariable String email,@PathVariable String password) throws JsonProcessingException{
+		List<User> logedInUser = userRepo.findByEmailAndPassword(email, password);
+		if(logedInUser.size()==1) {			
+			Map<String,Object> response = new HashMap<>();
+			response.put("userId",logedInUser.get(0).getId());
+			response.put("name",logedInUser.get(0).getFullName());
+			Optional<Questionarrie> firstTime = questionRepo.findByUser(logedInUser.get(0));			
+			if(firstTime.isPresent()) {
+				response.put("firstTime",false);
+			}else {
+				response.put("firstTime",true);
+			}			
+			String responseJson = new ObjectMapper().writeValueAsString(response);
+			return new ResponseEntity<String>(responseJson,HttpStatus.OK);		
 		}else {
 			return new ResponseEntity<String>("Not Found",HttpStatus.NOT_FOUND);
-		}
-		
+		}	
 	}
 	
 	@GetMapping("/google")
