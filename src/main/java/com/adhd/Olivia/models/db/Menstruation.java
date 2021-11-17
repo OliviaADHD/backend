@@ -11,11 +11,21 @@ import javax.persistence.Id;
 public class Menstruation {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private Integer id; //main key of the table, right?
+    private Integer id; //main key of the table, right? same as user id?
+
+    private String login; //in order to have it the same as in the user table
 
     private Date LastPeriodStart; 
     private Integer PeriodCycleLength; //Note: this involves counting. Might be easier for the user to be able to put two dates in actually :P
     private Integer PeriodLength;
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
 
     public Integer getId() {
         return id;
