@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping(path="/menstruation")
@@ -45,7 +44,7 @@ public class MenstruationController {
                 menstruationRepository.save(newMenstruation);
                 return new ResponseEntity<String>("Added new",HttpStatus.CREATED);
             } else {
-                // update it 
+                // update it
                 Menstruation oldMenstruation = optionalMenstruation.get(0);
                 oldMenstruation.setLastPeriodStart(menstruation.getLastPeriodStart());
                 oldMenstruation.setPeriodCycleLength(menstruation.getPeriodCycleLength());
@@ -58,13 +57,15 @@ public class MenstruationController {
 
     }
 
+
+
     @GetMapping("/getMenstruationData")
     public ResponseEntity<String> getLastPeriodStart(@RequestBody String userLogin){
-        System.out.println("Get Start of Last Period");
+        System.out.println("Get Start of Last Period"+userLogin);
         //getting the correct Id for the user name to check whether it exists
         List<Menstruation> optionalMenstruation = menstruationRepository.findByLogin(userLogin);
         if (optionalMenstruation.isEmpty()){
-            return new ResponseEntity<String>("Doesn't exist", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<String>("Doesn't exist...", HttpStatus.NOT_FOUND);
         } else{
             String response = "{ 'userId':"+optionalMenstruation.get(0).getId()+
                     ", 'login':"+optionalMenstruation.get(0).getLogin()+
