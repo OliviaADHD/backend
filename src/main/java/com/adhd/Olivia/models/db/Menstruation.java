@@ -23,6 +23,16 @@ public class Menstruation {
     private int periodCycleLength; //Note: this involves counting. Might be easier for the user to be able to put two dates in actually :P
     private int periodLength;
 
+    private String regular;
+
+    public String getRegular() {
+        return regular;
+    }
+
+    public void setRegular(String regular) {
+        this.regular = regular;
+    }
+
     public String getLogin() {
         return login;
     }
