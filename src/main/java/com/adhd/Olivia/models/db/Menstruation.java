@@ -1,45 +1,42 @@
 package com.adhd.Olivia.models.db;
 
+import com.adhd.Olivia.enums.AgeGroup;
+import com.adhd.Olivia.enums.RegularMenstruation;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Menstruation {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private int id; //main key of the table, right? same as user id?
+    private int id;
 
-    private String login; //in order to have it the same as in the user table
+    @Column(name = "first_time")
+    private boolean firstTime;
 
-    @JsonFormat(pattern = "dd/MM/yyyy")
-    private Date lastPeriodStart;
+    @Column(name = "regular")
+    @Enumerated(EnumType.ORDINAL)
+    private RegularMenstruation regular;
 
-    private int periodCycleLength; //Note: this involves counting. Might be easier for the user to be able to put two dates in actually :P
-    private int periodLength;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
-    private String regular;
+    @OneToMany(mappedBy="menstruation", targetEntity = PeriodLength.class)
+    private List<PeriodLength> periodLengths = new ArrayList<>();
 
-    public String getRegular() {
-        return regular;
-    }
+    @OneToMany(mappedBy="menstruation", targetEntity = PeriodCycleLength.class)
+    private List<PeriodCycleLength> periodCycleLengths = new ArrayList<>();
 
-    public void setRegular(String regular) {
-        this.regular = regular;
-    }
 
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
+    @OneToMany(mappedBy="menstruation", cascade = CascadeType.ALL, targetEntity = LastPeriodDate.class)
+    private List<LastPeriodDate> lastPeriodStarts = new ArrayList<>();
 
     public int getId() {
         return id;
@@ -49,27 +46,63 @@ public class Menstruation {
         this.id = id;
     }
 
-    public Date getLastPeriodStart() {
-        return lastPeriodStart;
+    public boolean isFirstTime() {
+        return firstTime;
     }
 
-    public void setLastPeriodStart(Date lastPeriodStart) {
-        this.lastPeriodStart = lastPeriodStart;
+    public void setFirstTime(boolean firstTime) {
+        this.firstTime = firstTime;
     }
 
-    public int getPeriodCycleLength() {
-        return periodCycleLength;
+    public RegularMenstruation getRegular() {
+        return regular;
     }
 
-    public void setPeriodCycleLength(int periodCycleLength) {
-        this.periodCycleLength = periodCycleLength;
+    public void setRegular(RegularMenstruation regular) {
+        this.regular = regular;
     }
 
-    public int getPeriodLength() {
-        return periodLength;
+    public User getUser() {
+        return user;
     }
 
-    public void setPeriodLength(int periodLength) {
-        this.periodLength = periodLength;
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<PeriodLength> getPeriodLengths() {
+        return periodLengths;
+    }
+
+    public void addPeriodLength(PeriodLength periodLength){
+        periodLengths.add(periodLength);
+    }
+
+    public void addPeriodCycleLengths(PeriodCycleLength periodCycleLength){
+        periodCycleLengths.add(periodCycleLength);
+    }
+
+    public void addLastPeriodStarts(LastPeriodDate periodDate){
+        lastPeriodStarts.add(periodDate);
+    }
+
+    public void setPeriodLengths(List<PeriodLength> periodLengths) {
+        this.periodLengths = periodLengths;
+    }
+
+    public List<PeriodCycleLength> getPeriodCycleLengths() {
+        return periodCycleLengths;
+    }
+
+    public void setPeriodCycleLengths(List<PeriodCycleLength> periodCycleLengths) {
+        this.periodCycleLengths = periodCycleLengths;
+    }
+
+    public List<LastPeriodDate> getLastPeriodStarts() {
+        return lastPeriodStarts;
+    }
+
+    public void setLastPeriodStarts(List<LastPeriodDate> lastPeriodStarts) {
+        this.lastPeriodStarts = lastPeriodStarts;
     }
 }
