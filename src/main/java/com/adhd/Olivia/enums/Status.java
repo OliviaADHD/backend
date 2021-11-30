@@ -1,10 +1,10 @@
 package com.adhd.Olivia.enums;
 
 public enum Status {
-	DIAGNOSED(1, "Diagnosed ADHD"),
-	UNDIAGNOSED(2, "Undiagnosed ADHD"),
-	SYMPTOMS(3, "I have symptoms"),
-	NOTSURE(4, "Not Sure");
+	DIAGNOSED(0, "Diagnosed ADHD"),
+	UNDIAGNOSED(1, "Undiagnosed ADHD"),
+	SYMPTOMS(2, "I have symptoms"),
+	NOTSURE(3, "Not Sure");
 	
 	private String description;
 	private int id;

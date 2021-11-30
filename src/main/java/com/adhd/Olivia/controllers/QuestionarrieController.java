@@ -1,5 +1,8 @@
 package com.adhd.Olivia.controllers;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +16,6 @@ import com.adhd.Olivia.enums.Duration;
 import com.adhd.Olivia.enums.Status;
 import com.adhd.Olivia.models.db.Questionarrie;
 import com.adhd.Olivia.models.db.User;
-import com.adhd.Olivia.models.response.QuestionarrieResp;
 import com.adhd.Olivia.repo.QuestionarrieRepo;
 import com.adhd.Olivia.repo.UserRepository;
 
@@ -30,17 +32,25 @@ public class QuestionarrieController {
 	public UserRepository userRepo;
 	
 	@PostMapping("/")
-	public ResponseEntity<String> login(@RequestBody QuestionarrieResp response){
+	public ResponseEntity<String> login(@RequestBody Map<String, Object> response){
 		Questionarrie newAnswer = new Questionarrie();
-		newAnswer.setAgeGroup(AgeGroup.getById(response.getAgeGroup()));
-		System.out.println(response.getStatus());
-		newAnswer.setStatus(Status.getById(response.getStatus()));
-		User usr = userRepo.findById(response.getUserId());
+		int ageGroup = (int) response.get("ageGroup");
+		int status = (int) response.get("status");
+		int userId = (int) response.get("userId");
+		List<Integer> sleepTime = (List<Integer>) response.get("sleepTime");
+		List<Integer> symptoms = (List<Integer>) response.get("symptoms");
+		if(response.get("duration") == null) {
+			newAnswer.setDuration(null);
+		}else {
+			int duration = (int) response.get("duration");
+			newAnswer.setDuration(Duration.getById(duration));
+		}		
+		newAnswer.setAgeGroup(AgeGroup.getById(ageGroup));
+		newAnswer.setStatus(Status.getById(status));
+		User usr = userRepo.findById(userId);
 		newAnswer.setUser(usr);
-		newAnswer.setSymptoms(response.getSymptoms());
-		System.out.println(response.getDuration());
-		newAnswer.setDuration(Duration.getById(response.getDuration()));
-		newAnswer.setSleepTime(response.getSleepTime());
+		newAnswer.setSymptoms(symptoms);
+		newAnswer.setSleepTime(sleepTime);
 		questionRepo.save(newAnswer);
 		return new ResponseEntity<String>("OK",HttpStatus.CREATED);		
 	}

@@ -1,12 +1,12 @@
 package com.adhd.Olivia.enums;
 
 public enum SleepTime {
-	WELLSLEEP(1, "I sleep well"),
-	NIGHTMARES(2, "I have nightmares"),
-	INSOMNIA(3, "I suffer from insomnia"),
-	TOOLATETOBED(4, "I go to bed too late"),
-	NARCOLEPSY(5, "Narcolepsy"),
-	WAKEFREQUENTLY(6, "Waking up frequently at night");
+	WELLSLEEP(0, "I sleep well"),
+	NIGHTMARES(1, "I have nightmares"),
+	INSOMNIA(2, "I suffer from insomnia"),
+	TOOLATETOBED(3, "I go to bed too late"),
+	NARCOLEPSY(4, "Narcolepsy"),
+	WAKEFREQUENTLY(5, "Waking up frequently at night");
 	
 	private String description;
 	private int id;
