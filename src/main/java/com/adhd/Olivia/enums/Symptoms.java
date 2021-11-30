@@ -1,11 +1,11 @@
 package com.adhd.Olivia.enums;
 
 public enum Symptoms {
-	TARDINESS(1, "Tardiness in achieving your goals"),
-	DIFFICULTIESFOCUSED(2, "Difficulty keeping your mind focused"),
-	TROUBLESATTHEBEGINNING(3, "Trouble in starting"),
-	EASILTYDISTRACTED(4, "Being easily distracted"),
-	IMPULSIVE(5, "Impulsive behavior");
+	TARDINESS(0, "Tardiness in achieving your goals"),
+	DIFFICULTIESFOCUSED(1, "Difficulty keeping your mind focused"),
+	TROUBLESATTHEBEGINNING(2, "Trouble in starting"),
+	EASILTYDISTRACTED(3, "Being easily distracted"),
+	IMPULSIVE(4, "Impulsive behavior");
 	
 	private String description;
 	private int id;

@@ -1,11 +1,11 @@
 package com.adhd.Olivia.enums;
 
 public enum AgeGroup {
-	EIGHTEEN(1, "18-25 years"),
-	TWENTYFIVE(2, "25-35 years"),
-	THIRTYFIVE(3, "35-45 years"),
-	FOURTYFIVE(4, "45-55 yeards"),
-	FIFTYFIVE(5, "55 and above");
+	EIGHTEEN(0, "18-25 years"),
+	TWENTYFIVE(1, "25-35 years"),
+	THIRTYFIVE(2, "35-45 years"),
+	FOURTYFIVE(3, "45-55 yeards"),
+	FIFTYFIVE(4, "55 and above");
 	
 	private String description;
 	private int id;
