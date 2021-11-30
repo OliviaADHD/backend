@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.adhd.Olivia.models.db.Questionarrie;
 import com.adhd.Olivia.models.db.User;
-import com.adhd.Olivia.models.response.Login;
 import com.adhd.Olivia.repo.QuestionarrieRepo;
 import com.adhd.Olivia.repo.UserRepository;
 import com.adhd.Olivia.services.MailService;
