@@ -30,8 +30,8 @@ public class MenstruationController {
     @Autowired
     private LastPeriodDateRepository lastPeriodDateRepo;
 
-    @GetMapping("/checkUserMenstruationDataExists")
-    public ResponseEntity<String> getUserMenstruationData(@RequestBody String userId){
+    @GetMapping("/checkUserMenstruationDataExists/{userId}")
+    public ResponseEntity<String> getUserMenstruationData(@PathVariable String userId){
         System.out.println("Put Data for " + userId);
         int id = 0;
         try {
@@ -50,8 +50,8 @@ public class MenstruationController {
         }
     }
 
-    @GetMapping("/getUserData")
-    public ResponseEntity<String> getUserData(@RequestBody String userId){
+    @GetMapping("/getUserData/{userId}")
+    public ResponseEntity<String> getUserData(@PathVariable String userId){
         System.out.println("check data for "+ userId);
         int id = 0;
         try {
@@ -76,21 +76,26 @@ public class MenstruationController {
                 for (PeriodCycleLength p: pCL){
                     responsePCL = responsePCL + p.getPeriodCycleLength() + ", ";
                 }
+                responsePCL = responsePCL.substring(0,responsePCL.length()-2);
+
                 String responsePL = "";
                 for (PeriodLength p: pL){
                     responsePL = responsePL + p.getPeriodLength() + ", ";
                 }
                 String responseLPD = "";
+                responsePL = responsePL.substring(0, responsePL.length()-2);
+
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
                 for (LastPeriodDate p: lPD){
-                    responseLPD = responseLPD + formatter.format(p.getLastPeriodStart()) + ", ";
+                    responseLPD = responseLPD + "\""+formatter.format(p.getLastPeriodStart()) + "\""+", ";
                 }
+                responseLPD = responseLPD.substring(0, responseLPD.length()-2);
 
-                String response = "{ 'regular':" + menstru.getRegular()+
-                        ", 'firstTime':" + menstru.isFirstTime() +
-                        ", 'periodCycleLengths': [" + responsePCL + "]" +
-                        ", 'PeriodLengths': [" + responsePL + "]" +
-                        ", 'LastPeriodStarts': [" + responseLPD + "]" +
+                String response = "{ \"regular\":" + true+
+                        ", \"firstTime\":" + menstru.isFirstTime() +
+                        ", \"periodCycleLengths\": [" + responsePCL + "]" +
+                        ", \"PeriodLengths\": [" + responsePL + "]" +
+                        ", \"LastPeriodStarts\": [" + responseLPD + "]" +
                         "}";
                 return new ResponseEntity<String>(response,HttpStatus.OK);
             }
