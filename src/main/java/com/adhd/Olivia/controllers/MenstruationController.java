@@ -31,27 +31,39 @@ public class MenstruationController {
     private LastPeriodDateRepository lastPeriodDateRepo;
 
     @GetMapping("/checkUserMenstruationDataExists")
-    public ResponseEntity<String> getUserMenstruationData(@RequestBody String userLogin){
-        System.out.println("Put Data for " + userLogin);
+    public ResponseEntity<String> getUserMenstruationData(@RequestBody String userId){
+        System.out.println("Put Data for " + userId);
+        int id = 0;
+        try {
+            id = Integer.parseInt(userId);
+        } catch (NumberFormatException e) {
+            return new ResponseEntity<String>("invalid input", HttpStatus.BAD_REQUEST);
+        }
         //check whether the user exists:
-        List<User> loginBasedUsers = userRepo.findByLogin(userLogin);
-        if(loginBasedUsers.size() == 0) {
+        User loginBasedUser = userRepo.findById(id);
+        if(loginBasedUser == null) {
             return new ResponseEntity<String>("User doesn't exist", HttpStatus.NOT_FOUND);
         } else { // user exists. First time he registers?
-            Optional<Menstruation> menstruationUser = menstruationRepo.findByUser(loginBasedUsers.get(0));
+            Optional<Menstruation> menstruationUser = menstruationRepo.findByUser(loginBasedUser);
             return new ResponseEntity<String>("{Exists: "+menstruationUser.isPresent()+"}", HttpStatus.OK);
 
         }
     }
 
     @GetMapping("/getUserData")
-    public ResponseEntity<String> getUserData(@RequestBody String userLogin){
-        System.out.println("check data for "+ userLogin);
-        List<User> loginBasedUsers = userRepo.findByLogin(userLogin);
-        if(loginBasedUsers.size() == 0) {
+    public ResponseEntity<String> getUserData(@RequestBody String userId){
+        System.out.println("check data for "+ userId);
+        int id = 0;
+        try {
+            id = Integer.parseInt(userId);
+        } catch (NumberFormatException e) {
+            return new ResponseEntity<String>("invalid input", HttpStatus.BAD_REQUEST);
+        }
+        User loginBasedUser = userRepo.findById(id);
+        if(loginBasedUser == null) {
             return new ResponseEntity<String>("User doesn't exist", HttpStatus.NOT_FOUND);
         } else {
-            Optional<Menstruation> menstruationUser = menstruationRepo.findByUser(loginBasedUsers.get(0));
+            Optional<Menstruation> menstruationUser = menstruationRepo.findByUser(loginBasedUser);
             if (!menstruationUser.isPresent()) {
                 return new ResponseEntity<String>("No data entered for this user", HttpStatus.NOT_FOUND);
             } else {
@@ -88,7 +100,7 @@ public class MenstruationController {
     @PutMapping("/setUserDataFirstTime")
     public ResponseEntity<String> setUserDataFirstTime(@RequestBody Map<String, String> json){
 
-        if ((!json.containsKey("lastPeriodStart")) || (!json.containsKey("login")) ||
+        if ((!json.containsKey("lastPeriodStart")) || (!json.containsKey("userId")) ||
                 (!json.containsKey("periodLength")) || (!json.containsKey("periodCycleLength")) ||
                 (!json.containsKey("regular"))) {
             return new ResponseEntity<String>("invalid input", HttpStatus.BAD_REQUEST);
@@ -105,18 +117,22 @@ public class MenstruationController {
         }
         Date lastPeriodStart = new Date(parsed.getTime());
         //check whether the user exists:
-        List<User> loginBasedUsers = userRepo.findByLogin(json.get("login"));
-        if(loginBasedUsers.size() == 0) {
+        int id = 0;
+        try{ id = Integer.parseInt(json.get("userId")); }
+        catch (NumberFormatException e) {
+            return new ResponseEntity<String>("invalid input", HttpStatus.BAD_REQUEST); }
+        User loginBasedUser = userRepo.findById(id);
+        if(loginBasedUser == null) {
             return new ResponseEntity<String>("User doesn't exist", HttpStatus.NOT_FOUND);
         } else { // user exists. Is it his first time?
-            Optional<Menstruation> menstruationUser = menstruationRepo.findByUser(loginBasedUsers.get(0));
+            Optional<Menstruation> menstruationUser = menstruationRepo.findByUser(loginBasedUser);
             if (menstruationUser.isPresent()){ //no!
                 return new ResponseEntity<String>("Not first time", HttpStatus.FORBIDDEN);
             } else {
                 Menstruation firstMenstruation = new Menstruation();
                 firstMenstruation.setFirstTime(false);
                 firstMenstruation.setRegular(RegularMenstruation.getById(Integer.parseInt(json.get("regular"))));
-                firstMenstruation.setUser(loginBasedUsers.get(0));
+                firstMenstruation.setUser(loginBasedUser);
 
                 PeriodLength periodLength = new PeriodLength();
                 periodLength.setPeriodLength(Integer.parseInt(json.get("periodLength")));
@@ -157,11 +173,16 @@ public class MenstruationController {
         }
         Date lastPeriodStart = new Date(parsed.getTime());
 
-        List<User> loginBasedUsers = userRepo.findByLogin(json.get("login"));
-        if(loginBasedUsers.size() == 0) {
+        //check whether the user exists:
+        int id = 0;
+        try{ id = Integer.parseInt(json.get("userId")); }
+        catch (NumberFormatException e) {
+            return new ResponseEntity<String>("invalid input", HttpStatus.BAD_REQUEST); }
+        User loginBasedUser = userRepo.findById(id);
+        if(loginBasedUser == null) {
             return new ResponseEntity<String>("User doesn't exist", HttpStatus.NOT_FOUND);
         } else { // user exists. Is it his first time?
-            Optional<Menstruation> menstruationUser = menstruationRepo.findByUser(loginBasedUsers.get(0));
+            Optional<Menstruation> menstruationUser = menstruationRepo.findByUser(loginBasedUser);
             if (!menstruationUser.isPresent()){
                 return new ResponseEntity<String>("First time", HttpStatus.FORBIDDEN);
             } else {
@@ -181,11 +202,16 @@ public class MenstruationController {
     public ResponseEntity<String> updateCycleLength(@RequestBody Map<String, String> json) {
         System.out.println("updating the cycle length" + json.toString());
 
-        List<User> loginBasedUsers = userRepo.findByLogin(json.get("login"));
-        if(loginBasedUsers.size() == 0) {
+        //check whether the user exists:
+        int id = 0;
+        try{ id = Integer.parseInt(json.get("userId")); }
+        catch (NumberFormatException e) {
+            return new ResponseEntity<String>("invalid input", HttpStatus.BAD_REQUEST); }
+        User loginBasedUser = userRepo.findById(id);
+        if(loginBasedUser == null) {
             return new ResponseEntity<String>("User doesn't exist", HttpStatus.NOT_FOUND);
         } else { // user exists. Is it his first time?
-            Optional<Menstruation> menstruationUser = menstruationRepo.findByUser(loginBasedUsers.get(0));
+            Optional<Menstruation> menstruationUser = menstruationRepo.findByUser(loginBasedUser);
             if (!menstruationUser.isPresent()){
                 return new ResponseEntity<String>("First time", HttpStatus.FORBIDDEN);
             } else {
@@ -204,11 +230,16 @@ public class MenstruationController {
     public ResponseEntity<String> updatePeriodLength(@RequestBody Map<String, String> json) {
         System.out.println("updating the cycle length" + json.toString());
 
-        List<User> loginBasedUsers = userRepo.findByLogin(json.get("login"));
-        if(loginBasedUsers.size() == 0) {
+        //check whether the user exists:
+        int id = 0;
+        try{ id = Integer.parseInt(json.get("userId")); }
+        catch (NumberFormatException e) {
+            return new ResponseEntity<String>("invalid input", HttpStatus.BAD_REQUEST); }
+        User loginBasedUser = userRepo.findById(id);
+        if(loginBasedUser == null) {
             return new ResponseEntity<String>("User doesn't exist", HttpStatus.NOT_FOUND);
         } else { // user exists. Is it his first time?
-            Optional<Menstruation> menstruationUser = menstruationRepo.findByUser(loginBasedUsers.get(0));
+            Optional<Menstruation> menstruationUser = menstruationRepo.findByUser(loginBasedUser);
             if (!menstruationUser.isPresent()){
                 return new ResponseEntity<String>("First time", HttpStatus.FORBIDDEN);
             } else {
