@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +29,7 @@ import com.adhd.Olivia.custom.MailTypes;
 
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/user")
 public class RegisterController {
 	
 	@Autowired
@@ -98,7 +97,7 @@ public class RegisterController {
 	
 	
 	@PostMapping("/login")
-	public ResponseEntity<String> signIn(@RequestBody String json) throws JsonProcessingException{
+	public ResponseEntity<String> login(@RequestBody String json) throws JsonProcessingException{
 		ObjectMapper mapper = new ObjectMapper();
         try {
             Map<String, String> map = mapper.readValue(json, Map.class);
@@ -123,26 +122,6 @@ public class RegisterController {
         } catch (IOException e) {
         	return new ResponseEntity<String>("Server Error",HttpStatus.INTERNAL_SERVER_ERROR);
         }		
-	}
-	
-	@GetMapping("/login2/{email}/{password}")
-	public ResponseEntity<String> temporalLogin(@PathVariable String email,@PathVariable String password) throws JsonProcessingException{
-		List<User> logedInUser = userRepo.findByEmailAndPassword(email, password);
-		if(logedInUser.size()==1) {			
-			Map<String,Object> response = new HashMap<>();
-			response.put("userId",logedInUser.get(0).getId());
-			response.put("name",logedInUser.get(0).getFullName());
-			Optional<Questionarrie> firstTime = questionRepo.findByUser(logedInUser.get(0));			
-			if(firstTime.isPresent()) {
-				response.put("firstTime",false);
-			}else {
-				response.put("firstTime",true);
-			}			
-			String responseJson = new ObjectMapper().writeValueAsString(response);
-			return new ResponseEntity<String>(responseJson,HttpStatus.OK);		
-		}else {
-			return new ResponseEntity<String>("Not Found",HttpStatus.NOT_FOUND);
-		}	
 	}
 	
 	@GetMapping("/google")

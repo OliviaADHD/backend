@@ -31,8 +31,8 @@ public class QuestionarrieController {
 	@Autowired
 	public UserRepository userRepo;
 	
-	@PostMapping("/")
-	public ResponseEntity<String> login(@RequestBody Map<String, Object> response){
+	@PostMapping
+	public ResponseEntity<String> postQuestions(@RequestBody Map<String, Object> response){
 		Questionarrie newAnswer = new Questionarrie();
 		int ageGroup = (int) response.get("ageGroup");
 		int status = (int) response.get("status");
