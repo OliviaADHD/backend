@@ -14,14 +14,14 @@ import com.adhd.Olivia.models.db.User;
 import com.adhd.Olivia.repo.UserRepository;
 
 @RestController
-@RequestMapping("/validation")
+@RequestMapping("/user")
 public class ValidationController {
 	
 	@Autowired
 	public UserRepository userRepo;
 	
 	@PostMapping("/login/{login}")
-	public ResponseEntity<String> checkLogin(@PathVariable String login){
+	public ResponseEntity<String> validateLogin(@PathVariable String login){
 		System.out.println(login);
 		List<User> loginBasedUsers = userRepo.findByLogin(login);
 		if(loginBasedUsers.size()>0) {
@@ -31,7 +31,7 @@ public class ValidationController {
 	}
 	
 	@PostMapping("/email/{email}")
-	public ResponseEntity<String> checkEmail(@PathVariable String email){
+	public ResponseEntity<String> validateEmail(@PathVariable String email){
 		System.out.println(email);
 		List<User> emailBasedUsers = userRepo.findByEmail(email);
 		if(emailBasedUsers.size()>0) {
