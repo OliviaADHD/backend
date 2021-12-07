@@ -158,7 +158,7 @@ public class MenstruationController {
                 periodLengthRepo.save(periodLength);
                 periodCycleLengthRepo.save(periodCycleLength);
                 lastPeriodDateRepo.save(lastPeriodDate);
-                return new ResponseEntity<String>("Created",HttpStatus.CREATED);
+                return new ResponseEntity<String>("Created", HttpStatus.CREATED);
             }
         }
     }
