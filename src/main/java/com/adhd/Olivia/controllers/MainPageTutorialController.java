@@ -34,7 +34,7 @@ public class MainPageTutorialController {
             return new ResponseEntity<String>("User doesn't exist", HttpStatus.NOT_FOUND);
         } else { // user exists. First time he registers?
             Optional<MainPageTutorial> tutDone = mainPageTutRepo.findByUser(loginBasedUser);
-            return new ResponseEntity<String>("{Exists: " + tutDone.isPresent()+"}", HttpStatus.OK);
+            return new ResponseEntity<String>("{\"Exists\": " + tutDone.isPresent()+"}", HttpStatus.OK);
         }
     }
 
@@ -50,13 +50,22 @@ public class MainPageTutorialController {
         User loginBasedUser = userRepo.findById(id);
         if(loginBasedUser == null) {
             return new ResponseEntity<String>("User doesn't exist", HttpStatus.NOT_FOUND);
-        } else { // user exists. Register him
-            MainPageTutorial mainPageTuto = new MainPageTutorial();
-            mainPageTuto.setTutorialDone(true);
-            mainPageTuto.setUser(loginBasedUser);
+        } else { // user exists. Check if already registered
+            Optional<MainPageTutorial> tutDone = mainPageTutRepo.findByUser(loginBasedUser);
+            if (tutDone.isPresent()){
+                MainPageTutorial mainPageTuto = tutDone.get();
+                mainPageTuto.setTutorialDone(true);
+                mainPageTutRepo.save(mainPageTuto);
+                return new ResponseEntity<String>("Tutorial done 2nd", HttpStatus.OK);
+                //change Value and save it
+            } else {
+                MainPageTutorial mainPageTuto = new MainPageTutorial();
+                mainPageTuto.setTutorialDone(true);
+                mainPageTuto.setUser(loginBasedUser);
 
-            mainPageTutRepo.save(mainPageTuto);
-            return new ResponseEntity<String>("Tutorial done", HttpStatus.OK);
+                mainPageTutRepo.save(mainPageTuto);
+                return new ResponseEntity<String>("Tutorial done", HttpStatus.OK);
+            }
         }
     }
 
