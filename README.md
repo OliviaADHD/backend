@@ -18,3 +18,9 @@ This will create connection of your port within entire worldwide web.
 
 1. Execute: `mvn clean install spring-boot:run`
 2. Make the port 8080 clean
+
+# Swagger
+
+It can be accessed by the following link:
+
+http://localhost:8080/swagger-ui.htm
