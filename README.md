@@ -23,4 +23,4 @@ This will create connection of your port within entire worldwide web.
 
 It can be accessed by the following link:
 
-http://localhost:8080/swagger-ui.htm
+http://localhost:8080/swagger-ui.html
