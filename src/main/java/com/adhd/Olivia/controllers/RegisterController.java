@@ -64,11 +64,11 @@ public class RegisterController {
 	
 	
 	@PostMapping("/reset-password")
-	public ResponseEntity<String> reset(@RequestBody String json) throws MessagingException, JsonMappingException, JsonProcessingException{
+	public ResponseEntity<String> reset(@RequestBody String json) throws MessagingException, JsonMappingException, JsonProcessingException{		
 		ObjectMapper mapper = new ObjectMapper();
         Map<String, String> map = mapper.readValue(json, Map.class);
         String email = map.get("email");
-		System.out.println(email);
+        System.out.println("Reset Password"+email);
 		List<User> emailBasedUsers = userRepo.findByEmail(email);
 		if(emailBasedUsers.size()==0) {
 			return new ResponseEntity<String>("Email doesn't exist",HttpStatus.FORBIDDEN);
