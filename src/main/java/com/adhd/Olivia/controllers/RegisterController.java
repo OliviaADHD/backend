@@ -11,6 +11,8 @@ import java.util.*;
 
 import javax.mail.MessagingException;
 
+import com.adhd.Olivia.models.db.FacebookUser;
+import com.adhd.Olivia.repo.FacebookUserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,9 @@ public class RegisterController {
 	
 	@Autowired
 	public QuestionarrieRepo questionRepo;
+
+	@Autowired
+	public FacebookUserRepository fbRepo;
 	
 	@Autowired
 	private MailService mailService;
@@ -87,7 +92,7 @@ public class RegisterController {
 	
 
 	@PostMapping("signup-google/{token}")
-	public ResponseEntity<String> newUserGoogle2(@PathVariable String token) throws IOException {
+	public ResponseEntity<String> newUserGoogle(@PathVariable String token) throws IOException {
 		// from https://developers.google.com/identity/sign-in/web/backend-auth -> don't understand how that works...
 		URL url = new URL("https://www.googleapis.com/oauth2/v3/userinfo");
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -139,9 +144,123 @@ public class RegisterController {
 
 	}
 
-	@PostMapping("/facebook")
-	public ResponseEntity<String> newUserByFacebook(@RequestBody User user){
-		return new ResponseEntity<String>("Waiting for development",HttpStatus.TEMPORARY_REDIRECT);		
+	@PostMapping("signup-facebook/{token}")
+	public ResponseEntity<String> newUserFacebook(@PathVariable String token) throws IOException {
+		URL url = new URL("https://graph.facebook.com/v12.0/me?fields=id%2Cname%2Cemail&access_token="+token);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.connect();
+		int responseCode = conn.getResponseCode();
+		if (responseCode != 200) {
+			return new ResponseEntity<String>("Error connecting to Facebook", HttpStatus.BAD_REQUEST);
+		} else {
+			String json = "";
+			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream()), "UTF-8"));
+			StringBuilder sb = new StringBuilder();
+			String output;
+			while ((output = br.readLine()) != null) {
+				sb.append(output);
+			}
+			json = sb.toString();
+			ObjectMapper mapper = new ObjectMapper();
+			try{
+				Map<String, String> map = mapper.readValue(json, Map.class);
+				String email = map.get("email");
+				String name = map.get("name");
+				String fb_id = map.get("id");
+				String login = "facebook";
+				String password = "facebook";
+				// check if email exists already
+				List<User> emailBasedUsers = userRepo.findByEmail(email);
+				if(emailBasedUsers.size()>0) {
+					return new ResponseEntity<String>("Email exists",HttpStatus.FORBIDDEN);
+				}
+				List<FacebookUser> facebookUsers = fbRepo.findByfbId(fb_id);
+				if (facebookUsers.size()>0) {
+					return new ResponseEntity<String>("fb exists",HttpStatus.FORBIDDEN);
+				}
+				User user = new User();
+				user.setEmail(email);
+				user.setPassword(password);
+				user.setFullName(name);
+				user.setLogin(login);
+				userRepo.save(user);
+
+				FacebookUser fbUser = new FacebookUser();
+				fbUser.setUser(user);
+				fbUser.setFbId(fb_id);
+				fbRepo.save(fbUser);
+
+				Map<String,Object> response = new HashMap<>();
+				response.put("userId",user.getId());
+				response.put("name",user.getFullName());
+				String jsonToReturn = new ObjectMapper().writeValueAsString(response);
+				return new ResponseEntity<String>(jsonToReturn, HttpStatus.CREATED);
+			} catch (IOException e) {
+				return new ResponseEntity<String>("Server Error for map",HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+
+	}
+
+
+	@PostMapping("login-facebook/{token}")
+	public ResponseEntity<String> loginByFacebook(@PathVariable String token) throws IOException {
+		URL url = new URL("https://graph.facebook.com/v12.0/me?fields=id%2Cname%2Cemail&access_token="+token);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.connect();
+		//get the response
+		int responseCode = conn.getResponseCode();
+		if (responseCode != 200) {
+			return new ResponseEntity<String>("Error connecting to Facebook", HttpStatus.BAD_REQUEST);
+		} else {
+			String json = "";
+			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream()), "UTF-8"));
+			StringBuilder sb = new StringBuilder();
+			String output;
+			while ((output = br.readLine()) != null) {
+				sb.append(output);
+			}
+			json = sb.toString();
+			//Use the objectMapper just as for the regular login -> won't work as it's not
+			ObjectMapper mapper = new ObjectMapper();
+			try{
+				Map<String, String> map = mapper.readValue(json, Map.class);
+				String email = map.get("email");
+				String fb_id = map.get("id");
+				// check if email exists already
+				List<User> emailBasedUsers = userRepo.findByEmail(email);
+				List<FacebookUser> facebookUsers = fbRepo.findByfbId(fb_id);
+				if(facebookUsers.size()==1) {
+					User user = facebookUsers.get(0).getUser();
+					if (emailBasedUsers.size()==1) {
+						if (facebookUsers.get(0).getUser() != emailBasedUsers.get(0)) {
+							user.setEmail(email);
+							userRepo.save(user);
+						}
+					} else {
+						user.setEmail(email);
+						userRepo.save(user);
+					}
+					Map<String,Object> response = new HashMap<>();
+					response.put("userId",user.getId());
+					response.put("name",user.getFullName());
+					Optional<Questionarrie> firstTime = questionRepo.findByUser(user);
+					if(firstTime.isPresent()) {
+						response.put("firstTime",false);
+					}else {
+						response.put("firstTime",true);
+					}
+					String responseJson = new ObjectMapper().writeValueAsString(response);
+					return new ResponseEntity<String>(responseJson,HttpStatus.OK);
+				} else {
+					return new ResponseEntity<String>("Not Found",HttpStatus.NOT_FOUND);
+				}
+
+			} catch (IOException e) {
+				return new ResponseEntity<String>("Server Error for map",HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+
 	}
 	
 	@PostMapping("/apple")
@@ -158,6 +277,9 @@ public class RegisterController {
             String email = map.get("email");
             String password = map.get("password");
 			if (password.equals("google")) {
+				return new ResponseEntity<String>("Not Found",HttpStatus.NOT_FOUND);
+			}
+			if (password.equals("facebook")){
 				return new ResponseEntity<String>("Not Found",HttpStatus.NOT_FOUND);
 			}
     		List<User> logedInUser = userRepo.findByEmailAndPassword(email, password);
@@ -182,7 +304,7 @@ public class RegisterController {
 	}
 	
 	@PostMapping("login-google/{token}")
-	public ResponseEntity<String> loginByGoogle2(@PathVariable String token) throws IOException {
+	public ResponseEntity<String> loginByGoogle(@PathVariable String token) throws IOException {
 		// from https://developers.google.com/identity/sign-in/web/backend-auth -> don't understand how that works...
 		URL url = new URL("https://www.googleapis.com/oauth2/v3/userinfo");
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -233,11 +355,7 @@ public class RegisterController {
 
 	}
 
-	
-	@GetMapping("/facebook")
-	public ResponseEntity<String> loginByFacebook(@RequestBody String email,@RequestBody String password){
-		return new ResponseEntity<String>("Waiting for development",HttpStatus.TEMPORARY_REDIRECT);			
-	}
+
 	
 	@GetMapping("/apple")
 	public ResponseEntity<String> loginByApple(@RequestBody String email,@RequestBody String password){
