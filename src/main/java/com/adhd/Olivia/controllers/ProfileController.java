@@ -1,6 +1,7 @@
 package com.adhd.Olivia.controllers;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.adhd.Olivia.enums.Language;
+import com.adhd.Olivia.models.db.Profile;
+import com.adhd.Olivia.models.db.User;
 import com.adhd.Olivia.repo.ProfileRepository;
 import com.adhd.Olivia.repo.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,16 +37,25 @@ public class ProfileController {
 	@PostMapping("/preferences")
 	public ResponseEntity<String> preferencesSave(@RequestBody String json){
 		ObjectMapper mapper = new ObjectMapper();		
-		Map<Object, String> map = null;
 		try {
 			JsonNode actualObj = mapper.readTree(json);
-			String language = actualObj.get("language").asText();
-			int darkMode = actualObj.get("darkMode").asInt();
-			boolean userId = actualObj.get("userId").asBoolean();
+			int language = actualObj.get("language").asInt();
+			boolean darkMode = actualObj.get("darkMode").asBoolean();
+			int userId = actualObj.get("userId").asInt();
+			User usr = userRepo.findById(userId);
+			Optional<Profile> optProf = profileRepo.findByUser(usr);
+			if(optProf.isEmpty()) {
+				return new ResponseEntity<String>("Server Error",HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			Profile prof = optProf.get();
+			prof.setDarkMode(darkMode);
+			prof.setLanguage(Language.getById(language));
+			profileRepo.save(prof);
+			return new ResponseEntity<String>("OK",HttpStatus.OK);
 		} catch (JsonProcessingException e) {
 			return new ResponseEntity<String>("Server Error",HttpStatus.INTERNAL_SERVER_ERROR);	
 		}	
-		return new ResponseEntity<String>("Waiting for development",HttpStatus.TEMPORARY_REDIRECT);		
+				
 	}
 	
 	@PostMapping("/privacy")

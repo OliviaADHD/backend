@@ -21,7 +21,7 @@ public class Profile {
     private int id;
 	
 	@Column(columnDefinition = "boolean default false")
-	private boolean darkMood;
+	private boolean darkMode;
 	
 	@Column(columnDefinition = "boolean default false")
 	private boolean hidePhoto;
@@ -45,12 +45,12 @@ public class Profile {
 		this.id = id;
 	}
 
-	public boolean isDarkMood() {
-		return darkMood;
+	public boolean isDarkMode() {
+		return darkMode;
 	}
 
-	public void setDarkMood(boolean darkMood) {
-		this.darkMood = darkMood;
+	public void setDarkMode(boolean darkMode) {
+		this.darkMode = darkMode;
 	}
 
 	public boolean isHidePhoto() {

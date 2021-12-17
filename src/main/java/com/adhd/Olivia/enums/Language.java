@@ -17,5 +17,14 @@ public enum Language {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}	
+	}
+	
+	public static Language getById(int id) {
+		switch (id) {
+			case 0: return Language.ENGLISH;
+			case 1: return Language.FRENCH;
+			case 2: return Language.SPANISH;
+			default: return null;
+		}		
+	}
 }
