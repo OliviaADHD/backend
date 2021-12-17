@@ -20,10 +20,13 @@ public class Profile {
 	@GeneratedValue(strategy=GenerationType.AUTO)
     private int id;
 	
+	@Column(columnDefinition = "boolean default false")
 	private boolean darkMood;
 	
+	@Column(columnDefinition = "boolean default false")
 	private boolean hidePhoto;
 	
+	@Column(columnDefinition = "boolean default false")
 	private boolean stopNotification;
 	
     @OneToOne(cascade = CascadeType.ALL)
@@ -32,7 +35,7 @@ public class Profile {
     
 	@Column(name = "status")
 	@Enumerated(EnumType.STRING)
-    private Language language;
+    private Language language = Language.ENGLISH;
 
 	public int getId() {
 		return id;

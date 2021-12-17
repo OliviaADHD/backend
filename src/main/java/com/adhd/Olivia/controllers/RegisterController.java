@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.adhd.Olivia.models.db.Profile;
 import com.adhd.Olivia.models.db.Questionarrie;
 import com.adhd.Olivia.models.db.User;
+import com.adhd.Olivia.repo.ProfileRepository;
 import com.adhd.Olivia.repo.QuestionarrieRepo;
 import com.adhd.Olivia.repo.UserRepository;
 import com.adhd.Olivia.services.MailService;
@@ -40,10 +42,12 @@ public class RegisterController {
 	
 	@Autowired
 	private MailService mailService;
+	
+	@Autowired
+	public ProfileRepository profileRepo;
     
 	@PostMapping("/signup")
 	public ResponseEntity<String> newUser(@RequestBody User user) throws MessagingException, JsonProcessingException{
-		System.out.println(user.getFullName());
 		List<User> emailBasedUsers = userRepo.findByEmail(user.getEmail());
 		List<User> loginBasedUsers = userRepo.findByLogin(user.getLogin());
 		if(emailBasedUsers.size()>0) {
@@ -56,8 +60,11 @@ public class RegisterController {
 		Map<String,Object> response = new HashMap<>();
 		response.put("userId",user.getId());
 		response.put("name",user.getFullName());
+		Profile newProfile = new Profile();
+		newProfile.setUser(user);
+		profileRepo.save(newProfile);
 		String json = new ObjectMapper().writeValueAsString(response);
-		mailService.sendEmail(MailTypes.signUp(user.getEmail()));
+		//mailService.sendEmail(MailTypes.signUp(user.getEmail()));
 		return new ResponseEntity<String>(json,HttpStatus.CREATED);		
 	}
 	
