@@ -60,20 +60,24 @@ public class ProfileController {
 	
 	@PostMapping("/privacy")
 	public ResponseEntity<String> privacySave(@RequestBody String json){
-		ObjectMapper mapper = new ObjectMapper();
-		Map<String, String> map = null;
+		ObjectMapper mapper = new ObjectMapper();	
 		try {
-			map = mapper.readValue(json, Map.class);
+			JsonNode actualObj = mapper.readTree(json);
+			boolean hidePhoto = actualObj.get("hidePhoto").asBoolean();
+			boolean stopNotification = actualObj.get("stopNotification").asBoolean();
+			int userId = actualObj.get("userId").asInt();
+			User usr = userRepo.findById(userId);
+			Optional<Profile> optProf = profileRepo.findByUser(usr);
+			if(optProf.isEmpty()) {
+				return new ResponseEntity<String>("User",HttpStatus.NOT_FOUND);
+			}
+			Profile prof = optProf.get();
+			prof.setHidePhoto(hidePhoto);
+			prof.setStopNotification(stopNotification);
+			profileRepo.save(prof);
+			return new ResponseEntity<String>("OK",HttpStatus.OK);
 		} catch (JsonProcessingException e) {
 			return new ResponseEntity<String>("Server Error",HttpStatus.INTERNAL_SERVER_ERROR);	
-		}
-		try {
-			String hidePhoto = map.get("hidePhoto");
-			String userId =  map.get("userId");
-			String stopNotification = map.get("darkMood");	
-		}catch (NullPointerException e) {
-			return new ResponseEntity<String>("Server Error",HttpStatus.INTERNAL_SERVER_ERROR);	
-		}
-		return new ResponseEntity<String>("Waiting for development",HttpStatus.TEMPORARY_REDIRECT);	
+		}	
 	}
 }
