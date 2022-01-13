@@ -12,7 +12,9 @@ import java.util.*;
 import javax.mail.MessagingException;
 
 import com.adhd.Olivia.models.db.FacebookUser;
+import com.adhd.Olivia.models.db.MainPageTutorial;
 import com.adhd.Olivia.repo.FacebookUserRepository;
+import com.adhd.Olivia.repo.MainPageTutorialRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,9 @@ public class RegisterController {
 
 	@Autowired
 	public FacebookUserRepository fbRepo;
+
+	@Autowired
+	public MainPageTutorialRepository mainPageTutRepo;
 	
 	@Autowired
 	private MailService mailService;
@@ -257,6 +262,12 @@ public class RegisterController {
 					}else {
 						response.put("firstTime",true);
 					}
+					Optional<MainPageTutorial> tutorialDone = mainPageTutRepo.findByUser(user);
+					if (tutorialDone.isPresent()){
+						response.put("tutDone", true);
+					} else {
+						response.put("tutDone", false);
+					}
 					String responseJson = new ObjectMapper().writeValueAsString(response);
 					return new ResponseEntity<String>(responseJson,HttpStatus.OK);
 				} else {
@@ -294,12 +305,19 @@ public class RegisterController {
     			Map<String,Object> response = new HashMap<>();
     			response.put("userId",logedInUser.get(0).getId());
     			response.put("name",logedInUser.get(0).getFullName());
-    			Optional<Questionarrie> firstTime = questionRepo.findByUser(logedInUser.get(0));			
+    			Optional<Questionarrie> firstTime = questionRepo.findByUser(logedInUser.get(0));
     			if(firstTime.isPresent()) {
     				response.put("firstTime",false);
     			}else {
     				response.put("firstTime",true);
     			}
+
+				Optional<MainPageTutorial> tutorialDone = mainPageTutRepo.findByUser(logedInUser.get(0));
+				if (tutorialDone.isPresent()){
+					response.put("tutDone", true);
+				} else {
+					response.put("tutDone", false);
+				}
     			Optional<Profile> userProfile = profileRepo.findByUser(logedInUser.get(0));
     			if(userProfile.isEmpty()) {
     				return new ResponseEntity<String>("Server Error",HttpStatus.INTERNAL_SERVER_ERROR);
@@ -309,6 +327,7 @@ public class RegisterController {
     			response.put("darkMode", prof.isDarkMode());
     			response.put("hidePhoto", prof.isHidePhoto());
     			response.put("stopNotification", prof.isStopNotification());
+
     			String responseJson = new ObjectMapper().writeValueAsString(response);
     			return new ResponseEntity<String>(responseJson,HttpStatus.OK);		
     		}else {
@@ -357,6 +376,12 @@ public class RegisterController {
 						response.put("firstTime",false);
 					}else {
 						response.put("firstTime",true);
+					}
+					Optional<MainPageTutorial> tutorialDone = mainPageTutRepo.findByUser(emailBasedUsers.get(0));
+					if (tutorialDone.isPresent()){
+						response.put("tutDone", true);
+					} else {
+						response.put("tutDone", false);
 					}
 					String responseJson = new ObjectMapper().writeValueAsString(response);
 					return new ResponseEntity<String>(responseJson,HttpStatus.OK);
