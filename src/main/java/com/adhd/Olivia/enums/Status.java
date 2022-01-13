@@ -1,42 +1,32 @@
 package com.adhd.Olivia.enums;
 
 public enum Status {
-	DIAGNOSED(0, "Diagnosed ADHD"),
-	UNDIAGNOSED(1, "Undiagnosed ADHD"),
-	SYMPTOMS(2, "I have symptoms"),
-	NOTSURE(3, "Not Sure");
+	DIAGNOSED("Diagnosed ADHD"),
+	UNDIAGNOSED("Undiagnosed ADHD"),
+	SYMPTOMS("I have symptoms"),
+	NOTSURE("Not Sure");
 	
 	private String description;
-	private int id;
 	
-	Status(int id, String description){
-		this.id = id;
+	Status(String description){
 		this.description = description;
-	}
-	
+	}	
 	
 	public String getDescription() {
 		return description;
 	}
+	
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
-	}
-	
+
 	public static Status getById(int id){
-		Status response = null;
-		Status statuses[] = Status.values();
-		for(Status stat: statuses) {
-			if (stat.getId() == id) {
-				response = stat;
-				break;
-			}
-		}
-		return response;		
+		switch (id) {
+			case 0: return Status.DIAGNOSED;
+			case 1: return Status.UNDIAGNOSED;
+			case 2: return Status.SYMPTOMS;
+			case 3: return Status.NOTSURE;
+			default: return null;
+		}			
 	}
 }

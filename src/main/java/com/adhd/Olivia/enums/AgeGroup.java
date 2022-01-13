@@ -1,16 +1,15 @@
 package com.adhd.Olivia.enums;
 
 public enum AgeGroup {
-	EIGHTEEN(0, "18-25 years"),
-	TWENTYFIVE(1, "25-35 years"),
-	THIRTYFIVE(2, "35-45 years"),
-	FOURTYFIVE(3, "45-55 yeards"),
-	FIFTYFIVE(4, "55 and above");
+	EIGHTEEN("18-25 years"),
+	TWENTYFIVE("25-35 years"),
+	THIRTYFIVE("35-45 years"),
+	FOURTYFIVE("45-55 yeards"),
+	FIFTYFIVE("55 and above");
 	
 	private String description;
-	private int id;
-	AgeGroup(int id, String description){
-		this.id = id;
+
+	AgeGroup (String description){
 		this.description = description;
 	}
 	public String getDescription() {
@@ -19,23 +18,16 @@ public enum AgeGroup {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
-	}
 	
-	public static AgeGroup getById(int id){
-		AgeGroup response = null;
-		AgeGroup ages[] = AgeGroup.values();
-		for(AgeGroup age: ages) {
-			if (age.getId() == id) {
-				response = age;
-				break;
-			}
-		}
-		return response;		
+	public static AgeGroup getById(int id) {
+		switch (id) {
+			case 0: return AgeGroup.EIGHTEEN;
+			case 1: return AgeGroup.TWENTYFIVE;
+			case 2: return AgeGroup.THIRTYFIVE;
+			case 3: return AgeGroup.FOURTYFIVE;
+			case 4: return AgeGroup.FIFTYFIVE;
+			default: return null;
+		}		
 	}
 	
 }
