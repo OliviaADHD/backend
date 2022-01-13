@@ -36,6 +36,9 @@ public class Profile {
 	@Column(name = "status")
 	@Enumerated(EnumType.STRING)
     private Language language = Language.ENGLISH;
+	
+	@Column(nullable = true, length = 64)
+	private String profilePhoto;
 
 	public int getId() {
 		return id;
@@ -84,6 +87,13 @@ public class Profile {
 	public void setLanguage(Language language) {
 		this.language = language;
 	}
-	
+
+	public String getProfilePhoto() {
+		return profilePhoto;
+	}
+
+	public void setProfilePhoto(String profilePhoto) {
+		this.profilePhoto = profilePhoto;
+	}	
 	
 }
