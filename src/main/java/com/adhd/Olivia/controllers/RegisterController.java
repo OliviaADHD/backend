@@ -22,8 +22,10 @@ import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.bind.annotation.*;
 
+import com.adhd.Olivia.models.db.Profile;
 import com.adhd.Olivia.models.db.Questionarrie;
 import com.adhd.Olivia.models.db.User;
+import com.adhd.Olivia.repo.ProfileRepository;
 import com.adhd.Olivia.repo.QuestionarrieRepo;
 import com.adhd.Olivia.repo.UserRepository;
 import com.adhd.Olivia.services.MailService;
@@ -53,10 +55,12 @@ public class RegisterController {
 	
 	@Autowired
 	private MailService mailService;
+	
+	@Autowired
+	public ProfileRepository profileRepo;
     
 	@PostMapping("/signup")
 	public ResponseEntity<String> newUser(@RequestBody User user) throws MessagingException, JsonProcessingException{
-		System.out.println(user.getFullName());
 		List<User> emailBasedUsers = userRepo.findByEmail(user.getEmail());
 		List<User> loginBasedUsers = userRepo.findByLogin(user.getLogin());
 		if(emailBasedUsers.size()>0) {
@@ -69,6 +73,9 @@ public class RegisterController {
 		Map<String,Object> response = new HashMap<>();
 		response.put("userId",user.getId());
 		response.put("name",user.getFullName());
+		Profile newProfile = new Profile();
+		newProfile.setUser(user);
+		profileRepo.save(newProfile);
 		String json = new ObjectMapper().writeValueAsString(response);
 		//mailService.sendEmail(MailTypes.signUp(user.getEmail()));
 		return new ResponseEntity<String>(json,HttpStatus.CREATED);		
@@ -304,12 +311,23 @@ public class RegisterController {
     			}else {
     				response.put("firstTime",true);
     			}
+
 				Optional<MainPageTutorial> tutorialDone = mainPageTutRepo.findByUser(logedInUser.get(0));
 				if (tutorialDone.isPresent()){
 					response.put("tutDone", true);
 				} else {
 					response.put("tutDone", false);
 				}
+    			Optional<Profile> userProfile = profileRepo.findByUser(logedInUser.get(0));
+    			if(userProfile.isEmpty()) {
+    				return new ResponseEntity<String>("Server Error",HttpStatus.INTERNAL_SERVER_ERROR);
+    			}
+    			Profile prof = userProfile.get();
+    			response.put("language", prof.getLanguage().getDescription());
+    			response.put("darkMode", prof.isDarkMode());
+    			response.put("hidePhoto", prof.isHidePhoto());
+    			response.put("stopNotification", prof.isStopNotification());
+
     			String responseJson = new ObjectMapper().writeValueAsString(response);
     			return new ResponseEntity<String>(responseJson,HttpStatus.OK);		
     		}else {

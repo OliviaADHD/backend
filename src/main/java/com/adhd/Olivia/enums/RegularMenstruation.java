@@ -1,14 +1,13 @@
 package com.adhd.Olivia.enums;
 
 public enum RegularMenstruation {
-    REGULAR(0, "regular"),
-    NOTREGULAR(1, "not regular"),
-    NOTSURE(2, "not sure");
+    REGULAR("regular"),
+    NOTREGULAR("not regular"),
+    NOTSURE("not sure");
 
     private String description;
-    private int id;
-    RegularMenstruation(int id, String description){
-        this.id = id;
+
+    RegularMenstruation(String description){
         this.description = description;
     }
 
@@ -20,23 +19,13 @@ public enum RegularMenstruation {
         this.description = description;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public static RegularMenstruation getById(int id){
-        RegularMenstruation response = null;
-        RegularMenstruation regulars[] = RegularMenstruation.values();
-        for(RegularMenstruation reg: regulars) {
-            if (reg.getId() == id) {
-                response = reg;
-                break;
-            }
-        }
-        return response;
+		switch (id) {
+			case 0: return RegularMenstruation.REGULAR;
+			case 1: return RegularMenstruation.NOTREGULAR;
+			case 2: return RegularMenstruation.NOTSURE;
+			default: return null;
+		}	
     }
 }
