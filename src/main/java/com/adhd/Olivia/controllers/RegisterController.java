@@ -299,7 +299,16 @@ public class RegisterController {
     				response.put("firstTime",false);
     			}else {
     				response.put("firstTime",true);
-    			}			
+    			}
+    			Optional<Profile> userProfile = profileRepo.findByUser(logedInUser.get(0));
+    			if(userProfile.isEmpty()) {
+    				return new ResponseEntity<String>("Server Error",HttpStatus.INTERNAL_SERVER_ERROR);
+    			}
+    			Profile prof = userProfile.get();
+    			response.put("language", prof.getLanguage().getDescription());
+    			response.put("darkMode", prof.isDarkMode());
+    			response.put("hidePhoto", prof.isHidePhoto());
+    			response.put("stopNotification", prof.isStopNotification());
     			String responseJson = new ObjectMapper().writeValueAsString(response);
     			return new ResponseEntity<String>(responseJson,HttpStatus.OK);		
     		}else {
