@@ -12,7 +12,7 @@ import java.util.*;
 import javax.mail.MessagingException;
 
 import com.adhd.Olivia.models.db.FacebookUser;
-import com.adhd.Olivia.models.db.MainPageTutorial;
+import com.adhd.Olivia.models.db.Tutorial;
 import com.adhd.Olivia.repo.FacebookUserRepository;
 import com.adhd.Olivia.repo.MainPageTutorialRepository;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -49,9 +49,6 @@ public class RegisterController {
 
 	@Autowired
 	public FacebookUserRepository fbRepo;
-
-	@Autowired
-	public MainPageTutorialRepository mainPageTutRepo;
 	
 	@Autowired
 	private MailService mailService;
@@ -262,7 +259,7 @@ public class RegisterController {
 					}else {
 						response.put("firstTime",true);
 					}
-					Optional<MainPageTutorial> tutorialDone = mainPageTutRepo.findByUser(user);
+					Optional<Tutorial> tutorialDone = mainPageTutRepo.findByUser(user);
 					if (tutorialDone.isPresent()){
 						response.put("tutDone", true);
 					} else {
@@ -312,7 +309,7 @@ public class RegisterController {
     				response.put("firstTime",true);
     			}
 
-				Optional<MainPageTutorial> tutorialDone = mainPageTutRepo.findByUser(logedInUser.get(0));
+				Optional<Tutorial> tutorialDone = mainPageTutRepo.findByUser(logedInUser.get(0));
 				if (tutorialDone.isPresent()){
 					response.put("tutDone", true);
 				} else {
@@ -377,7 +374,7 @@ public class RegisterController {
 					}else {
 						response.put("firstTime",true);
 					}
-					Optional<MainPageTutorial> tutorialDone = mainPageTutRepo.findByUser(emailBasedUsers.get(0));
+					Optional<Tutorial> tutorialDone = mainPageTutRepo.findByUser(emailBasedUsers.get(0));
 					if (tutorialDone.isPresent()){
 						response.put("tutDone", true);
 					} else {
