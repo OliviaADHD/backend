@@ -1,5 +1,6 @@
 package com.adhd.Olivia.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,8 +36,17 @@ public class TaskController {
 	@Autowired
 	public UserRepository userRepo;
 	
+	//Doesn't work take a look
 	@PostMapping
-	public ResponseEntity<String> newTask(@RequestBody Tasks task){
+	public ResponseEntity<String> newTask(@RequestBody String json) throws JsonMappingException, JsonProcessingException{
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode actualObj = mapper.readTree(json);
+		String newTODO = actualObj.get("todo").asText();
+		int userId = actualObj.get("userId").asInt();
+		User usr = userRepo.findById(userId);
+		Tasks task = new Tasks();
+		task.setTodo(newTODO);
+		task.setUser(usr);
 		taskRepo.save(task);
 		return new ResponseEntity<String>("OK",HttpStatus.CREATED);
 	}
@@ -52,16 +62,20 @@ public class TaskController {
 		if(allUserTasks.size() == 0) {
 			return new ResponseEntity<String>("BAD",HttpStatus.NOT_FOUND);
 		}
-		String json = new ObjectMapper().writeValueAsString(allUserTasks);
+		List<String> todos = new ArrayList<>();
+		for(Tasks currTask: allUserTasks) {
+			todos.add(currTask.getTodo());
+		}
+		String json = new ObjectMapper().writeValueAsString(todos);
 		return new ResponseEntity<String>(json,HttpStatus.CREATED);
 	}
 	
-	@PutMapping("/{taskId}")
-	public ResponseEntity<String> editTask(@PathVariable int taskId, @RequestBody String json) throws JsonMappingException, JsonProcessingException{
+	@PutMapping("/{todoID}")
+	public ResponseEntity<String> editTask(@PathVariable int todoID, @RequestBody String json) throws JsonMappingException, JsonProcessingException{
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode actualObj = mapper.readTree(json);
-		String newTODO = actualObj.get("task").toPrettyString();
-		Optional<Tasks> optTask = taskRepo.findById(taskId);
+		String newTODO = actualObj.get("todo").asText();
+		Optional<Tasks> optTask = taskRepo.findById(todoID);
 		if(optTask.isEmpty()) {
 			return new ResponseEntity<String>("NOT FOUND",HttpStatus.NOT_FOUND);
 		}
@@ -71,9 +85,10 @@ public class TaskController {
 		return new ResponseEntity<String>("UPDATED",HttpStatus.OK);
 	}
 	
-	@DeleteMapping("/{taskId}")
-	public ResponseEntity<String> editTask(@PathVariable int taskId) {
-		Optional<Tasks> optTask = taskRepo.findById(taskId);
+	
+	@DeleteMapping("/{todoID}")
+	public ResponseEntity<String> editTask(@PathVariable int todoID) {
+		Optional<Tasks> optTask = taskRepo.findById(todoID);
 		if(optTask.isEmpty()) {
 			return new ResponseEntity<String>("NOT FOUND",HttpStatus.NOT_FOUND);
 		}
