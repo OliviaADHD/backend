@@ -36,6 +36,9 @@ public class Profile {
 	@Column(name = "status")
 	@Enumerated(EnumType.STRING)
     private Language language = Language.ENGLISH;
+	
+	@Column(columnDefinition = "boolean default false")
+	private boolean tutorialCompleted;
 
 	public int getId() {
 		return id;
@@ -84,6 +87,16 @@ public class Profile {
 	public void setLanguage(Language language) {
 		this.language = language;
 	}
+
+	public boolean isTutorialCompleted() {
+		return tutorialCompleted;
+	}
+
+	public void setTutorialCompleted(boolean tutorialCompleted) {
+		this.tutorialCompleted = tutorialCompleted;
+	}
+	
+	
 	
 	
 }
