@@ -1,7 +1,9 @@
 package com.adhd.Olivia.controllers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,12 +64,42 @@ public class TaskController {
 		if(allUserTasks.size() == 0) {
 			return new ResponseEntity<String>("BAD",HttpStatus.NOT_FOUND);
 		}
-		List<String> todos = new ArrayList<>();
+		Map<String, Object> todos = new HashMap();
+		List<Map<String,Object>> res = new ArrayList<>();
 		for(Tasks currTask: allUserTasks) {
-			todos.add(currTask.getTodo());
-		}
-		String json = new ObjectMapper().writeValueAsString(todos);
+			todos.put("id", currTask.getId());
+			todos.put("todo",currTask.getTodo());
+			todos.put("completed",currTask.isCompleted());			
+			res.add(todos);
+			todos = new HashMap();
+		}		
+		String json = new ObjectMapper().writeValueAsString(res);
 		return new ResponseEntity<String>(json,HttpStatus.CREATED);
+	}
+	
+	@GetMapping("/{todoID}")
+	public ResponseEntity<String> taskStatus(@PathVariable int todoID, @RequestBody String json) {
+		System.out.println(json);
+		Optional<Tasks> optTask = taskRepo.findById(todoID);
+		if(optTask.isEmpty()) {
+			return new ResponseEntity<String>("NOT FOUND",HttpStatus.NOT_FOUND);
+		}
+		Tasks task = optTask.get();		
+		ObjectMapper mapper = new ObjectMapper();
+		System.out.println(json);
+		Map<String, Boolean> actualObj;
+		try {
+			actualObj = mapper.readValue(json, Map.class);
+			boolean completed = actualObj.get("completed");
+			task.setCompleted(completed);
+			taskRepo.save(task);
+			return new ResponseEntity<String>("COMPLETED",HttpStatus.OK);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new ResponseEntity<String>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	}
 	
 	@PutMapping("/{todoID}")
@@ -87,7 +119,7 @@ public class TaskController {
 	
 	
 	@DeleteMapping("/{todoID}")
-	public ResponseEntity<String> editTask(@PathVariable int todoID) {
+	public ResponseEntity<String> deleteTask(@PathVariable int todoID) {
 		Optional<Tasks> optTask = taskRepo.findById(todoID);
 		if(optTask.isEmpty()) {
 			return new ResponseEntity<String>("NOT FOUND",HttpStatus.NOT_FOUND);
