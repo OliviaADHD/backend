@@ -56,49 +56,46 @@ public class TaskController {
 	@GetMapping("/all/{userId}")
 	public ResponseEntity<String> getAll(@PathVariable int userId) throws JsonProcessingException{
 		User usr = userRepo.findById(userId);
-		Optional<List<Tasks>> optUserTasks = taskRepo.findByUser(usr);
-		if(!optUserTasks.isPresent()) {
+		Optional<List<Tasks>> optCompletedTasks = taskRepo.findByUserAndCompleted(usr,true);
+		Optional<List<Tasks>> optIncompletedTasks = taskRepo.findByUserAndCompleted(usr,false);
+		if(!optCompletedTasks.isPresent() && !optIncompletedTasks.isPresent() ) {
 			return new ResponseEntity<String>("BAD",HttpStatus.NOT_FOUND);
 		}
-		List<Tasks> allUserTasks = optUserTasks.get();
-		if(allUserTasks.size() == 0) {
+		List<Tasks> completedTasks = optCompletedTasks.get();
+		List<Tasks> incompletedTasks = optIncompletedTasks.get();
+		if(completedTasks.size() == 0 && incompletedTasks.size()==0 ) {
 			return new ResponseEntity<String>("BAD",HttpStatus.NOT_FOUND);
 		}
 		Map<String, Object> todos = new HashMap();
 		List<Map<String,Object>> res = new ArrayList<>();
-		for(Tasks currTask: allUserTasks) {
+		for(Tasks currTask: incompletedTasks) {
 			todos.put("id", currTask.getId());
 			todos.put("todo",currTask.getTodo());
 			todos.put("completed",currTask.isCompleted());			
 			res.add(todos);
 			todos = new HashMap();
-		}		
+		}
+		for(Tasks currTask: completedTasks) {
+			todos.put("id", currTask.getId());
+			todos.put("todo",currTask.getTodo());
+			todos.put("completed",currTask.isCompleted());			
+			res.add(todos);
+			todos = new HashMap();
+		}	
 		String json = new ObjectMapper().writeValueAsString(res);
 		return new ResponseEntity<String>(json,HttpStatus.CREATED);
 	}
 	
-	@GetMapping("/{todoID}")
-	public ResponseEntity<String> taskStatus(@PathVariable int todoID, @RequestBody String json) {
-		System.out.println(json);
+	@GetMapping("/{todoID}/{completed}")
+	public ResponseEntity<String> taskStatus(@PathVariable int todoID, @PathVariable boolean completed) {
 		Optional<Tasks> optTask = taskRepo.findById(todoID);
 		if(optTask.isEmpty()) {
 			return new ResponseEntity<String>("NOT FOUND",HttpStatus.NOT_FOUND);
 		}
-		Tasks task = optTask.get();		
-		ObjectMapper mapper = new ObjectMapper();
-		System.out.println(json);
-		Map<String, Boolean> actualObj;
-		try {
-			actualObj = mapper.readValue(json, Map.class);
-			boolean completed = actualObj.get("completed");
-			task.setCompleted(completed);
-			taskRepo.save(task);
-			return new ResponseEntity<String>("COMPLETED",HttpStatus.OK);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return new ResponseEntity<String>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		Tasks task = optTask.get();
+		task.setCompleted(completed);
+		taskRepo.save(task);
+		return new ResponseEntity<String>("COMPLETED",HttpStatus.OK);
 
 	}
 	

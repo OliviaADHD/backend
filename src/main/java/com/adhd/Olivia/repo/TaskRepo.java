@@ -11,4 +11,5 @@ import com.adhd.Olivia.models.db.User;
 
 public interface TaskRepo extends CrudRepository<Tasks, Integer> {
 	Optional<List<Tasks>> findByUser(User user);
+	Optional<List<Tasks>> findByUserAndCompleted(User user, boolean completed);
 }
