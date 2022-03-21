@@ -1,5 +1,6 @@
 package com.adhd.Olivia.models.db;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,6 +20,9 @@ public class Tasks {
 	@ManyToOne
     @JoinColumn(name="user_id", nullable=false)
 	private User user;
+	
+	@Column(columnDefinition = "boolean default false")
+	private boolean completed;
 
 	public int getId() {
 		return id;
@@ -43,7 +47,13 @@ public class Tasks {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	
-	
+
+	public boolean isCompleted() {
+		return completed;
+	}
+
+	public void setCompleted(boolean completed) {
+		this.completed = completed;
+	}
 
 }
